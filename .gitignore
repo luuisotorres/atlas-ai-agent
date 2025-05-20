@@ -172,3 +172,12 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# MacOS files
+.DS_Store
+
+# Additional files
+test_utils.py
+
+# Additional directories
+testing_files/

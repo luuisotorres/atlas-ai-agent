@@ -1,0 +1,16 @@
+[project]
+name = "atlas-ai-agent"
+version = "0.1.0"
+description = "Transform YouTube transcripts into Notion pages using AI agents"
+authors = [{ name = "Luis Fernando Torres" }]
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "openai>=1.13.3,<2.0.0",
+    "streamlit>=1.33.0,<2.0.0",
+    "notion-client>=2.0.0,<3.0.0",
+    "python-dotenv>=1.0.1,<2.0.0",
+    "agno>=0.1.1,<0.2.0",
+    "youtube-transcript-api>=1.0.3,<2.0.0",
+]
