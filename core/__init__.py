@@ -1,5 +1,5 @@
-from .utils import extract_youtube_vide_id
+from .utils import extract_youtube_video_id
 
 __all__ = [
-    "extract_youtube_vide_id",
+    "extract_youtube_video_id",
 ]

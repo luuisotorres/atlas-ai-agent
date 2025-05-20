@@ -1,7 +1,7 @@
 import re
 
 
-def extract_youtube_vide_id(input_str: str) -> str | None:
+def extract_youtube_video_id(input_str: str) -> str | None:
     """
     Extracts a YouTube video ID from a full URL or returns the input string if
     it is already a valid ID.
