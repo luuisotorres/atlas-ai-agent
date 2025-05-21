@@ -40,6 +40,11 @@ summarizer_agent = Agent(
             "preserve them."
         ),
         (
+            "Do not use terms like 'This section covers…', "
+            "'This section explains…', 'The speaker discusses…', "
+            "'Let's dive into', or 'Here, the speaker unpacks…'"
+        ),
+        (
             "Format important terms in **bold**, and use *italics* for "
             "emphasis when needed."
         ),
