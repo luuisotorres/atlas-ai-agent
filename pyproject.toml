@@ -13,4 +13,6 @@ dependencies = [
     "python-dotenv>=1.0.1,<2.0.0",
     "agno>=0.1.1,<0.2.0",
     "youtube-transcript-api>=1.0.3,<2.0.0",
+    "notion-client>=2.0.0,<3.0.0",
+    "duckduckgo-search>=8.0.2,<9.0.0",
 ]
