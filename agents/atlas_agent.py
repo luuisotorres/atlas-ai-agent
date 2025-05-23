@@ -5,12 +5,78 @@ import re
 from notion_client import Client
 from dotenv import load_dotenv
 from typing import List, Dict, Tuple
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Initialize Notion client
 notion = Client(auth=os.getenv("NOTION_TOKEN"))
+
+
+atlas_agent = Agent(
+    name="Atlas",
+    role=(
+        "Tansform summaries and research into structured "
+        "educational lessons."
+    ),
+    model=OpenAIChat(id="gpt-4o"),
+    description=(
+        "You are a brilliant educational agent with a passion for "
+        "clear explanations. "
+        "Your job is to take summarized content and external research "
+        "on the same topic. "
+        "and combine them into a single, engaging, well-structured "
+        "textbook lesson. "
+    ),
+    instructions=[
+        (
+            "Combine the summarized content and the enrichhment "
+            "into a cohesive lesson. "
+        ),
+        (
+            "Structure it clearly using markdown headings, subheadings, "
+            "bullet points, quotes, toggle lists, callout boxes, "
+            "and paragraphs. "
+        ),
+        (
+            "Avoid redundancy. Rephrase overlapping points and integrate "
+            "definitions and examples from enrichment when helpful."
+        ),
+        (
+            "Ensure it reads like a high-quality educational blog "
+            "or chapter from a learning course."
+        ),
+        (
+            "Always begin with a single main heading (#) as the lesson title"
+        ),
+        (
+            "Then structure the lesson with logical sections (##) and "
+            "smaller subsections (###) as approriate."
+        ),
+        (
+            "Make the lesson visually appealing, using quotes "
+            "and lists when helpful."
+        ),
+        (
+            "Do NOT mention 'summary' or 'enrichment'. Merge them naturally "
+            "into a fluid lesson"
+        ),
+        (
+            "Use code blocks as examples when appropriate."
+        ),
+        (
+            "Do not use any HTML tags under any circumstances."
+            "Tags like <details> and <summary> are not allowed."
+        ),
+        (
+            "Do not organize urls like this: [text](url) or ![text](url). "
+            "Instead, paste the full URL."
+        ),
+    ],
+    markdown=True
+)
 
 
 def parse_markdown_to_rich_text(line: str) -> List[Dict]:
@@ -57,8 +123,53 @@ def build_blocks(section: Dict) -> List[Dict]:
     lines = text.strip().split("\n")
     blocks = []
 
+    within_code_block = False
+    code_lines = []
+    code_language = ""
+
     for line in lines:
-        if line.startswith("# "):
+        if line.strip().startswith("```") and not within_code_block:
+            within_code_block = True
+            code_language = line.strip().replace("```", "").strip().lower()
+            valid_languages = {
+                "abap", "agda", "arduino", "ascii art", "assembly", "bash",
+                "basic", "bnf", "c", "c#", "c++", "clojure", "coffeescript",
+                "coq", "css", "dart", "dhall", "diff", "docker", "ebnf",
+                "elixir", "elm", "erlang", "f#", "flow", "fortran", "gherkin",
+                "glsl", "go", "graphql", "groovy", "haskell", "hcl", "html",
+                "idris", "java", "javascript", "json", "julia", "kotlin",
+                "latex", "less", "lisp", "livescript", "llvm ir", "lua",
+                "makefile", "markdown", "markup", "matlab", "mathematica",
+                "mermaid", "nix", "notion formula", "objective-c", "ocaml",
+                "pascal", "perl", "php", "plain text", "powershell", "prolog",
+                "protobuf", "purescript", "python", "r", "racket", "reason",
+                "ruby", "rust", "sass", "scala", "scheme", "scss", "shell",
+                "smalltalk", "solidity", "sql", "swift", "toml", "typescript",
+                "vb.net", "verilog", "vhdl", "visual basic", "webassembly",
+                "xml", "yaml", "java/c/c++/c#", "notionscript"
+            }
+            if code_language not in valid_languages:
+                code_language = "plain text"
+            code_lines = []
+        elif line.strip().startswith("```") and within_code_block:
+            within_code_block = False
+            blocks.append({
+                "object": "block",
+                "type": "code",
+                "code": {
+                    "rich_text": [{"type": "text", "text": {
+                        "content": "\n".join(code_lines)
+                    }}],
+                    "language": code_language
+                }
+            })
+            code_language = ""
+            continue
+        elif within_code_block:
+            code_lines.append(line)
+            continue
+
+        elif line.startswith("# "):
             blocks.append({
                 "object": "block",
                 "type": "heading_1",
@@ -74,6 +185,7 @@ def build_blocks(section: Dict) -> List[Dict]:
                     "rich_text": parse_markdown_to_rich_text(line[3:].strip())
                 }
             })
+
         elif line.startswith("### "):
             blocks.append({
                 "object": "block",
@@ -82,12 +194,23 @@ def build_blocks(section: Dict) -> List[Dict]:
                     "rich_text": parse_markdown_to_rich_text(line[3:].strip())
                 }
             })
-        elif line.startswith("- "):
+
+        elif line.startswith("#### "):
+            blocks.append({
+                "object": "block",
+                "type": "heading_3",
+                "heading_3": {
+                    "rich_text": parse_markdown_to_rich_text(line[5:].strip())
+                }
+            })
+        elif line.startswith("•") or line.startswith("- "):
             blocks.append({
                 "object": "block",
                 "type": "bulleted_list_item",
                 "bulleted_list_item": {
-                    "rich_text": parse_markdown_to_rich_text(line[2:].strip())
+                    "rich_text": parse_markdown_to_rich_text(line.lstrip(
+                        "•- "
+                    ).strip())
                 }
             })
         elif line.strip() == "---":
@@ -103,26 +226,31 @@ def build_blocks(section: Dict) -> List[Dict]:
                     "rich_text": parse_markdown_to_rich_text(line[2:].strip())
                 }
             })
-        elif line.startswith("•"):
-            blocks.append({
-                "object": "block",
-                "type": "bulleted_list_item",
-                "bulleted_list_item": {
-                    "rich_text": parse_markdown_to_rich_text(line[1:].strip())
-                }
-            })
         elif line:
-            blocks.append({
-                "object": "block",
-                "type": "paragraph",
-                "paragraph": {
-                    "rich_text": parse_markdown_to_rich_text(line.strip())
-                }
-            })
+            chunks = [line[i:i+2000] for i in range(0, len(line), 2000)]
+            for chunk in chunks:
+                blocks.append({
+                    "object": "block",
+                    "type": "paragraph",
+                    "paragraph": {
+                        "rich_text": parse_markdown_to_rich_text(chunk.strip())
+                    }
+                })
     return blocks
 
 
-def create_page(title: str, children: List[Dict]) -> Dict:
+def build_lesson(summary: str, enrichment: str) -> List[Dict]:
+    lesson_input = (
+        f"=== Summarized Content ===\n{summary.strip()}\n\n"
+        f"=== Enrichment ===\n{enrichment.strip()}\n\n"
+    )
+    response = atlas_agent.run(lesson_input)
+    return build_blocks({
+        "formatted_summary": str(response.content)
+    })
+
+
+def create_page(title: str) -> str:
     education_icons = ["📚", "🧠", "🎓", "📖", "📝", "💡", "🧑‍🏫", "🔬", "📐", "🌐"]
     education_covers = [
         "https://images.unsplash.com/photo-1551385917-889e48f92c21",
@@ -137,34 +265,28 @@ def create_page(title: str, children: List[Dict]) -> Dict:
     selected_icon = random.choice(education_icons)
     selected_cover = random.choice(education_covers)
 
-    return notion.pages.create(
-        parent={
-            "page_id": os.getenv("NOTION_PARENT_PAGE_ID")
-        },
+    page = notion.pages.create(
+        parent={"page_id": os.getenv("NOTION_PARENT_PAGE_ID")},
         properties={
             "title": {
                 "title": [
                     {
                         "type": "text",
-                        "text": {
-                            "content": f"Atlas Summary: {title}"
-                        }
+                        "text": {"content": f"Atlas Summary: {title}"}
                     }
                 ]
             }
         },
-        cover={
-            "type": "external",
-            "external": {
-                "url": selected_cover
-            }
-        },
-        icon={
-            "type": "emoji",
-            "emoji": selected_icon
-        },
-        children=children
+        icon={"type": "emoji", "emoji": selected_icon},
+        cover={"type": "external", "external": {"url": selected_cover}},
     )
+    return page["id"]
+
+
+def append_blocks(page_id: str, blocks: List[Dict]):
+    for i in range(0, len(blocks), 100):
+        batch = blocks[i:i + 100]
+        notion.blocks.children.append(block_id=page_id, children=batch)
 
 
 if __name__ == "__main__":
@@ -172,12 +294,26 @@ if __name__ == "__main__":
     print(f"Loading: formatted_section_{video_id}.json")
 
     blocks: List[Dict] = []
+
+    enrichment_path = f"transcript_file/research_enrichment_{video_id}.json"
+    with open(enrichment_path, "r", encoding="utf-8") as f:
+        enrichment_data = json.load(f)
+
     for section in sections:
-        blocks.extend(build_blocks(section))
+        summary = section.get("formatted_summary", "")
+        topic_keys = enrichment_data.keys()
+        matched_topics = next(
+            (key for key in topic_keys if key.lower() in summary.lower()), None
+        )
+        enrichment = enrichment_data.get(
+            matched_topics, ""
+        ) if matched_topics else ""
+        blocks.extend(build_lesson(summary, enrichment))
+
     print(f"Total blocks: {len(blocks)}")
     print("Creating page in Notion...")
-    created = create_page(
-        title=f"YouTube Video {video_id}",
-        children=blocks
+    page_id = create_page(title=f"YouTube Video {video_id}")
+    append_blocks(page_id, blocks)
+    print(
+        f"\n✅ Page created: https://www.notion.so/{page_id.replace('-', '')}"
     )
-    print(f"\n Page created: {created['url']}")
