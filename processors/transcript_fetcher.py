@@ -23,7 +23,7 @@ def fetch_transcript_raw(video_id: str) -> list[dict] | None:
     except NoTranscriptFound:
         print(f"No transcript found for video ID: {video_id}")
     except Exception as e:
-        print(f"An error occurred while fetching the transcript: {e}")
+        print(f"An error occurred while fetching the transcript: {repr(e)}")
     return None
 
 

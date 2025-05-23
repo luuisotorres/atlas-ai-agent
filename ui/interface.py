@@ -16,8 +16,18 @@ def run_interface():
 
     user_input = st.text_input("Enter YouTube video URL or ID:")
 
-    if st.button("Run"):
+    if "submitted" not in st.session_state:
+        st.session_state.submitted = False
+
+    if user_input and not st.session_state.submitted:
+        st.session_state.submitted = True
+        st.rerun()
+
+    if st.session_state.submitted:
         video_id = extract_youtube_video_id(user_input)
+
+        if video_id:
+            video_id = video_id.strip()
 
         if not video_id:
             st.error("Invalid YouTube URL or ID.")
@@ -29,7 +39,7 @@ def run_interface():
                 splitter = SectionSplitter()
                 sections = splitter.run(chunks)
 
-                output_folder = "transcript_file"
+                output_folder = "transcript_files"
 
                 if os.path.exists(output_folder):
                     shutil.rmtree(output_folder)
@@ -41,3 +51,7 @@ def run_interface():
                     json.dump(sections, f, ensure_ascii=False, indent=2)
 
                 st.success(f"Transcript sections saved to {output_path}")
+
+    if st.button("Reset"):
+        st.session_state.submitted = False
+        st.rerun()

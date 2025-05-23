@@ -67,11 +67,20 @@ atlas_agent = Agent(
             "Use code blocks as examples when appropriate."
         ),
         (
+            """Always put quotes and non-code examples in Notion's "
+            "quotes blocks by adding a '" ' before the text."""
+        ),
+        (
             "Do not use any HTML tags under any circumstances."
             "Tags like <details> and <summary> are not allowed."
         ),
         (
-            "Do not organize urls like this: [text](url) or ![text](url). "
+            "When using URLs, always put them below a "
+            "'### For Further Reading' section."
+        ),
+        (
+            "Do not organize URLs like this: [text](url) or ![text](url). "
+            "Never! "
             "Instead, paste the full URL."
         ),
     ],
@@ -106,7 +115,7 @@ def parse_markdown_to_rich_text(line: str) -> List[Dict]:
 
 
 def load_json(file_prefix: str) -> Tuple[List[Dict], str]:
-    input_dir = "transcript_file"
+    input_dir = "transcript_files"
     files = [
         f for f in os.listdir(input_dir) if f.startswith(file_prefix)
     ]
@@ -119,7 +128,7 @@ def load_json(file_prefix: str) -> Tuple[List[Dict], str]:
 
 
 def build_blocks(section: Dict) -> List[Dict]:
-    text = section.get("formatted_summary", "")
+    text = section.get("summary", "")
     lines = text.strip().split("\n")
     blocks = []
 
@@ -246,7 +255,7 @@ def build_lesson(summary: str, enrichment: str) -> List[Dict]:
     )
     response = atlas_agent.run(lesson_input)
     return build_blocks({
-        "formatted_summary": str(response.content)
+        "summary": str(response.content)
     })
 
 
@@ -290,17 +299,19 @@ def append_blocks(page_id: str, blocks: List[Dict]):
 
 
 if __name__ == "__main__":
-    sections, video_id = load_json("formatted_sections")
-    print(f"Loading: formatted_section_{video_id}.json")
+    sections, video_id = load_json("summarized_sections")
+    print(f"Loading: summarized_sections_{video_id}.json")
 
     blocks: List[Dict] = []
 
-    enrichment_path = f"transcript_file/research_enrichment_{video_id}.json"
+    enrichment_path = f"transcript_files/research_enrichment_{video_id}.json"
     with open(enrichment_path, "r", encoding="utf-8") as f:
         enrichment_data = json.load(f)
+    print(f"\nLoading enrichment file: research_enrichment_{video_id}.json")
+    print("\nAtlas is working on building a lesson…")
 
     for section in sections:
-        summary = section.get("formatted_summary", "")
+        summary = section.get("summary", "")
         topic_keys = enrichment_data.keys()
         matched_topics = next(
             (key for key in topic_keys if key.lower() in summary.lower()), None
@@ -310,9 +321,9 @@ if __name__ == "__main__":
         ) if matched_topics else ""
         blocks.extend(build_lesson(summary, enrichment))
 
-    print(f"Total blocks: {len(blocks)}")
-    print("Creating page in Notion...")
-    page_id = create_page(title=f"YouTube Video {video_id}")
+    print(f"\nTotal blocks: {len(blocks)}")
+    print("\n Atlas is creating page in Notion...")
+    page_id = create_page(title=f"YouTube Video ID – {video_id}")
     append_blocks(page_id, blocks)
     print(
         f"\n✅ Page created: https://www.notion.so/{page_id.replace('-', '')}"

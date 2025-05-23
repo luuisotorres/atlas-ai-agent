@@ -15,7 +15,7 @@ summarizer_agent = Agent(
     model=OpenAIChat(id="gpt-4o"),
     description=(
         """
-        You are a concise, insightful assistant that summarizes video sections
+        You are an insightful assistant that summarizes video sections
         with clarity.
         """
     ),
@@ -29,7 +29,8 @@ summarizer_agent = Agent(
             "discussed."
         ),
         (
-            "Use concise language that could fit well in a Notion document."
+            "Write in a clear, educational tone that feels at home in a "
+            "lesson, guide or study resource."
         ),
         (
             "Avoid repeating the speaker's filler words or tangents. "
@@ -45,8 +46,8 @@ summarizer_agent = Agent(
             "'Let's dive into', or 'Here, the speaker unpacks…'"
         ),
         (
-            "Format important terms in **bold**, and use *italics* for "
-            "emphasis when needed."
+            "Highlight key terms with **bold** formatting."
+            "Use *italics* sparingly to emphasize nuance or contrast."
         ),
         (
             "Ensure your summary can stand on its own: don't refer to the "
@@ -60,6 +61,10 @@ summarizer_agent = Agent(
             "speaker's ideas."
         ),
         (
+            "Keep the tone informative yet engaging. Feel free to echo the "
+            "speaker's original humor or energy when relevant."
+        ),
+        (
             "Make sure the output will be useful for a formatting agent, "
             "a research agent, and a Notion exporter downstream."
         ),
@@ -70,16 +75,35 @@ summarizer_agent = Agent(
 
         ),
         (
+            "Organize ideas in a way that helps a learner build understanding "
+            "step-by-step, even if it means reordering points slightly."
+        ),
+        (
+            "Include only quotes that are insightful, funny, or especially "
+            "illustrative, not just reiterations of the summary."
+        ),
+        (
+            "Automatically exclude promotional segments, sponsorship "
+            "mentions, or calls-to-action like 'sign up at' or 'thanks to...'"
+        ),
+        (
             "Ensure consistency in your markdown structure, always following "
             "the format: "
             "1. A summary paragraph. "
-            "2. A key points section (with bullets). "
-            "3. Notable quotes (if relevant)."
+            "2. A key points section with bullets. "
+            "3. Notable quotes."
+        ),
+        (
+            "Always start with a single '#' level heading that introduces the "
+            "entire section (e.g., a title like 'Overview of "
+            "Memory Management' or 'What is a CPU?'). "
+            "Avoid using '## Summary' or generic headings."
         ),
         (
             "The text should be structured as follows: "
-            "## Summary\n"
-            "The summary paragraph of the section.\n\n"
+            "# Title\n"
+            "The summary paragraph of the section with sections ('## ') and "
+            "subsections ('### ').\n\n"
             "## Key Points\n"
             "- Bullet 1\n"
             "- Bullet 2\n"
@@ -106,14 +130,14 @@ def summarize_sections_from_file(path: str) -> list[dict]:
 
 if __name__ == "__main__":
     # Extract video_id dynamically from the filename pattern
-    input_dir = "transcript_file"
+    input_dir = "transcript_files"
     # Find the first file matching the pattern sections_*.json
     files = [f for f in os.listdir(input_dir) if re.match(
         r"sections_(.+)\.json", f
     )]
     if not files:
         raise FileNotFoundError(
-            "No transcript section files found in transcript_file directory."
+            "No transcript section files found in transcript_files directory."
         )
     input_filename = files[0]
     match = re.match(r"sections_(.+)\.json", input_filename)

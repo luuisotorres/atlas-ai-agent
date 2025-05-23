@@ -65,7 +65,7 @@ def extract_topics_from_json(path: str, max_topics: int = 5) -> list[str]:
 
     candidates = set()
     for section in sections:
-        text = section.get("formatted_summary", "")
+        text = section.get("summary", "")
         matches = re.findall(r'\*\*(.*?)\*\*', text)  # Look for bolded itens
         candidates.update(matches)
 
@@ -84,13 +84,13 @@ def enrich_topic(topic: str) -> str:
 
 
 if __name__ == "__main__":
-    input_dir = "transcript_file"
+    input_dir = "transcript_files"
     files = [f for f in os.listdir(input_dir) if f.startswith(
-        "formatted_sections_"
+        "summarized_sections_"
     )]
     if not files:
         raise FileNotFoundError(
-            "No formatted_sections JSON file found in transcript_file"
+            "No summarized_sections_ JSON file found in transcript_files"
         )
 
     input_filename = files[0]  # Use the first one
@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
     # Save results
     video_id = re.search(
-        r"formatted_sections_(.+)\.json", input_filename
+        r"summarized_sections_(.+)\.json", input_filename
     ).group(1)
     output_path = os.path.join(
         input_dir, f"research_enrichment_{video_id}.json"
