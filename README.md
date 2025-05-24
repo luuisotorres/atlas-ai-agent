@@ -49,6 +49,8 @@ It extracts transcripts, summarizes content, enriches it with research, and outp
 ```bash
 git clone https://github.com/luuisotorres/atlas-ai-agent.git
 cd atlas-ai-agent
+uv venv
+source .venv/bin/activate
 uv pip install -r pyproject.toml
 cp .env.example .env  # Add your API keys and Notion page ID
 streamlit run main.py
@@ -132,15 +134,26 @@ git clone https://github.com/luuisotorres/atlas-ai-agent.git
 cd atlas-ai-agent
 ```
 
-### 2. Install dependencies
+### 2. Create a virtual environment
+```bash
+uv venv
+```
+
+### 3. Activate virtual environment 
+```bash
+source .venv/bin/activate
+```
+
+### 4. Install dependencies 
+```
 ```bash
 uv pip install -r pyproject.toml
 ```
 
-### 3. Python version
+### 5. Python version
 Make sure your Python version matches the one specified in the `.python-version` file.
 
-### 4. Configure your `.env` file
+### 6. Configure your `.env` file
 Copy the `.env.example` file:
 
 ```bash
@@ -171,7 +184,7 @@ To get it:
 3. Click on `Share` → `General access` → `Anyone on the web with link`.
 3. Copy the URL of the page — the part after `notion.so/` and before `?` is your Page ID (`NOTION_PARENT_PAGE_ID`).
 
-### 5. Run the app
+### 7. Run the app
 ```bash
 streamlit run main.py
 ```
