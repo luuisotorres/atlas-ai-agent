@@ -28,7 +28,7 @@ It extracts transcripts, summarizes content, enriches it with research, and outp
 - [Why Atlas?](#why-atlas)
 - [Possible Improvements & Known Issues](#possible-improvements--known-issues)
 - [Use Cases](#use-cases)
-- [Examples](#-examples)
+- [Examples](#examples)
 - [Author](#author)
 - [License](#license)
 
