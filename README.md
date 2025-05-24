@@ -32,6 +32,8 @@ It extracts transcripts, summarizes content, enriches it with research, and outp
 - [Author](#author)
 - [License](#license)
 
+---
+
 ## Features
 
 - Input a YouTube URL or Video ID
