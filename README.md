@@ -102,6 +102,8 @@ The enrichment is saved as `enrichment_data_<video_id>.json`.
 
 The user receives a polished, structured Notion page automatically generated based on the YouTube video.
 
+---
+
 ## Project Structure
 
 ```
