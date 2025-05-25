@@ -194,6 +194,14 @@ streamlit run main.py
 ## App Demonstration
 
 <p align="center">
+    <a href="https://www.youtube.com/watch?v=VSQbpnrpfI0" target="_blank">
+    <img src="https://img.youtube.com/vi/VSQbpnrpfI0/hqdefault.jpg" alt="Atlas AI Agent Demo" width="600"/>
+  </a>
+  <br>
+  <em>▶️ Watch the demo video: See Atlas transform a YouTube video into a Notion page in real time</em>
+</p>
+
+<p align="center">
   <img src="assets/atlas_interface.png" alt="Atlas Interface" width="600"/><br>
   <em>Interface: Enter YouTube URL or ID and let **Atlas** do the job</em>
 </p>
