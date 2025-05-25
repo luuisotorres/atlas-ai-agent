@@ -180,7 +180,7 @@ To get it:
 This is the ID of the Notion page where new pages will be created under.
 
 To get it:
-1. Open the Notion page you want to use as the parent.
+1. Open the Notion page you want to use as the parent page.
 2. Click the three dots on the top of the page `...` → `Connections` → Add your integration.
 3. Click on `Share` → `General access` → `Anyone on the web with link`.
 3. Copy the URL of the page — the part after `notion.so/` and before `?` is your Page ID (`NOTION_PARENT_PAGE_ID`).
