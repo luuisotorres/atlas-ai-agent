@@ -25,6 +25,7 @@ It extracts transcripts, summarizes content, enriches it with research, and outp
 - [Project Structure](#project-structure)
 - [Setup & Usage](#setup--usage)
 - [App Demonstration](#app-demonstration)
+- [Video Demo](#video-demo)
 - [Why Atlas?](#why-atlas)
 - [Possible Improvements & Known Issues](#possible-improvements--known-issues)
 - [Use Cases](#use-cases)
@@ -194,14 +195,6 @@ streamlit run main.py
 ## App Demonstration
 
 <p align="center">
-    <a href="https://www.youtube.com/watch?v=VSQbpnrpfI0" target="_blank">
-    <img src="https://img.youtube.com/vi/VSQbpnrpfI0/hqdefault.jpg" alt="Atlas AI Agent Demo" width="600"/>
-  </a>
-  <br>
-  <em>▶️ Watch the demo video: See Atlas transform a YouTube video into a Notion page in real time</em>
-</p>
-
-<p align="center">
   <img src="assets/atlas_interface.png" alt="Atlas Interface" width="600"/><br>
   <em>Interface: Enter YouTube URL or ID and let **Atlas** do the job</em>
 </p>
@@ -225,6 +218,14 @@ streamlit run main.py
   <img src="assets/notion_page_2.png" alt="Notion Page Result 2" width="600"/><br>
   <em>Each section is clear, well-formatted, and easy to navigate in Notion</em>
 </p>
+
+---
+
+## Video Demo
+
+Check out Atlas in action on YouTube:
+
+[![Watch the demo](https://img.youtube.com/vi/VSQbpnrpfI0/0.jpg)](https://www.youtube.com/watch?v=VSQbpnrpfI0)
 
 ---
 
