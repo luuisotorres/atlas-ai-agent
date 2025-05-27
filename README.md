@@ -146,7 +146,6 @@ source .venv/bin/activate
 ```
 
 ### 4. Install dependencies 
-```
 ```bash
 uv pip install -r pyproject.toml
 ```
